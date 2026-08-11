@@ -16,7 +16,7 @@ class EventSubController extends EventEmitter {
 
 	open() {
 		if (this.connection) {
-			Module.log.warn("Tried to start twitch eventsub connection when its already opened");
+			//Module.log.warn("Tried to start twitch eventsub connection when its already opened");
 			return;
 		}
 
@@ -32,7 +32,7 @@ class EventSubController extends EventEmitter {
 
 	close() {
 		if (!this.connection) {
-			Module.log.warn("Tried to close twitch eventsub connection when its already closed");
+			//Module.log.warn("Tried to close twitch eventsub connection when its already closed");
 			return;
 		}
 
