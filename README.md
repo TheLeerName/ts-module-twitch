@@ -1,5 +1,5 @@
 # WIP
-Do not expect it to work
+Do not expect it to work properly
 
 # Leer's TS module: Twitch
 Contains methods to use Twitch API

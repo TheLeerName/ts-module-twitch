@@ -8,9 +8,8 @@ class EventSubController extends EventEmitter {
 
 	readonly subscriptions: EventSub.Subscription[] = [];
 	async addSubscriptions(...subscriptions: EventSub.Subscription[]) {
-		this.subscriptions.push(...subscriptions);
 		if (this.connection)
-			for (const subscription of this.subscriptions)
+			for (const subscription of subscriptions)
 				await this.addSubscriptionToConnection(subscription);
 	}
 
@@ -22,7 +21,7 @@ class EventSubController extends EventEmitter {
 
 		this.connection = EventSub.startWebSocket(Module.authorization);
 		this.connection.on("message", m => this.emit("message", m));
-		this.connection.on("session_welcome", this.onSessionWelcome);
+		this.connection.on("session_welcome", (m, isR) => this.onSessionWelcome(m, isR));
 		this.connection.on("session_keepalive", m => this.emit("session_keepalive", m));
 		this.connection.on("session_reconnect", m => this.emit("session_reconnect", m));
 		this.connection.on("notification", m => this.emit("notification", m));
@@ -40,6 +39,8 @@ class EventSubController extends EventEmitter {
 		this.connection = null;
 		while(Module.data.subscriptionsID.length > 0)
 			Module.data.subscriptionsID.pop();
+		while(this.subscriptions.length > 0)
+			this.subscriptions.pop();
 		Module.data.save();
 	}
 
@@ -68,7 +69,10 @@ class EventSubController extends EventEmitter {
 			total: request.total,
 			total_cost: `${request.total_cost} / ${request.max_total_cost}`
 		}});
-		Module.data.subscriptionsID.push(request.data.id);
+		if (!Module.data.subscriptionsID.includes(request.data.id))
+			Module.data.subscriptionsID.push(request.data.id);
+		if (!this.subscriptions.includes(subscription))
+			this.subscriptions.push(subscription);
 		Module.data.save();
 	}
 
