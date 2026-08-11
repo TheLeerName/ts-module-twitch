@@ -74,6 +74,12 @@ class TwitchModule extends EventEmitter {
 	}
 
 	async validateToken() {
+		if (Options.twitchCLIMode) {
+			await this.refreshToken();
+			this.authorization.client_id = this.data.clientID;
+			return;
+		}
+
 		const response = await Request.OAuth2Validate(this.data.accessToken);
 		if (!response.ok) {
 			if (response.status === 401) {
