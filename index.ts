@@ -5,6 +5,8 @@ import WebSocket from "./websocket.js";
 import TerminalCommandInit from "./terminal-commands/init.js";
 
 import * as Twitch from "twitch.ts";
+import axiosRetry from "axios-retry";
+import axios from "axios";
 import { EventEmitter } from "node:events";
 
 interface TwitchModuleEvents {
@@ -45,6 +47,9 @@ export class TwitchModule extends EventEmitter {
 	}
 
 	protected async onAppInitialized() {
+		// init axios-retry
+		axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
+
 		await this.data.checkRequiredFields();
 		await this.authorization.validate();
 		this.emit("initialized");
