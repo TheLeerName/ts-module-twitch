@@ -64,6 +64,30 @@ export class TwitchModule extends EventEmitter {
 		});*/
 	}
 
+	translateToRU_gameName(gameName: string): string {
+		switch(gameName) {
+			case "": return "Без категории";
+			case "Just Chatting": return "Общение";
+			case "Games + Demos": return "Игры и Демо";
+			case "Politics": return "Политика";
+			case "Art": return "Искусство";
+			case "Music": return "Музыка";
+			case "DJs": return "Диджеи";
+			case "Talk Shows & Podcasts": return "Ток-шоу и подкасты";
+			case "Special Events": return "Мероприятия";
+			case "Animals, Aquariums, and Zoos": return "Животные, аквариумы и зоопарки";
+			default: return gameName;
+		}
+	}
+
+	getVODSavingTime(broadcasterType: Twitch.Helix.GetUsers.ResponseBody["data"][0]["broadcaster_type"]): number {
+		switch(broadcasterType) {
+			case "partner":   return 5184000000; // 60 days in ms
+			case "affiliate": return 1209600000; // 14 days in ms
+			case "":          return 604800000;  // 7 days in ms
+		}
+	}
+
 	override once<EventName extends keyof TwitchModuleEvents>(eventName: EventName, listener: TwitchModuleEvents[EventName]) {
 		return super.once(eventName, listener);
 	}
