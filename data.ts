@@ -1,36 +1,33 @@
-import Core from "../../index.js";
+import { TwitchModule as Module } from "./index.js";
 import { BaseData } from "../../data.js";
-
-import { Options } from "twitch.ts";
+import { twitchInitName } from "./terminal-commands/init.js";
 
 export default class ModuleData extends BaseData {
-	clientID: string = "";
-	clientSecret: string = "";
-	accessToken: string = "";
-	refreshToken: string = "";
-	subscriptionsID: string[] = [];
+	protected module: Module;
+	/** Module will disable itself on next app start, when fatal error will occure */
+	disabled: boolean = false;
 
 	initialize() {
-		const json = super.getSavedFields();
+		const json = this.getSavedFields();
 		let needsSave = true;
 
-		needsSave = !this.registerFieldString(json, "clientID");
-		needsSave = !this.registerFieldString(json, "clientSecret");
-		needsSave = !this.registerFieldString(json, "accessToken");
-		needsSave = !this.registerFieldString(json, "refreshToken");
-		needsSave = !this.registerFieldArray(json, "subscriptionsID");
+		needsSave = !this.registerFieldMap(json, "authorization",
+			savedValue => this.module.authorization.fromJSON(savedValue),
+			() => this.module.authorization.toJSON(),
+		);
+		needsSave = !this.registerFieldBoolean(json, "disabled");
 
 		if (needsSave)
 			this.save();
 		return this;
 	}
 
-	checkRequiredFields() {
-		if (this.clientID.length < 1)
-			Core.log.fatal(`Config parameter "clientID" is empty, please initialize app with "node index.js twitch:init"`);
-		if (this.clientSecret.length < 1)
-			Core.log.fatal(`Config parameter "clientSecret" is empty, please initialize app with "node index.js twitch:init"`);
-		if (this.refreshToken.length < 1 && !Options.twitchCLIMode)
-			Core.log.fatal(`Config parameter "refreshToken" is empty, please initialize app with "node index.js twitch:init"`);
+	async checkRequiredFields() {
+		if (this.module.authorization.refresh_token.length < 1)
+			await this.module.fatalWithDisabling(`Saved data is malformed, please initialize module with "node index.js ${twitchInitName}"`, {error: `authorization.refresh is expected as non-empty string`});
+		if (this.module.authorization.client_id.length < 1)
+			await this.module.fatalWithDisabling(`Saved data is malformed, please initialize module with "node index.js ${twitchInitName}"`, {error: `authorization.id is expected as non-empty string`});
+		if (this.module.authorization.client_secret.length < 1)
+			await this.module.fatalWithDisabling(`Saved data is malformed, please initialize module with "node index.js ${twitchInitName}"`, {error: `authorization.secret is expected as non-empty string`});
 	}
 }
