@@ -49,6 +49,7 @@ export default class Authorization {
 
 		this.token = result.access_token;
 		this.refresh_token = result.refresh_token;
+		await Module.data.save();
 	}
 
 	async validate() {
