@@ -3,9 +3,10 @@ import { BaseData } from "../../data.js";
 import { twitchInitName } from "./terminal-commands/init.js";
 
 export default class ModuleData extends BaseData {
-	protected module: Module;
 	/** Module will disable itself on next app start, when fatal error will occure */
 	disabled: boolean = false;
+
+	protected module: Module;
 
 	initialize() {
 		const json = this.getSavedFields();
