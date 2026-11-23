@@ -111,6 +111,7 @@ export const twitchInitName = "twitch:init";
 
 export default () => {
 	TerminalCommands.registerWithReadlineInterface(twitchInitName, async(argv, rl) => {
+		await Module.load();
 		if (argv.length > 0) {
 			if (argv.includes("client_id")) {
 				await clientIDPart(rl);
