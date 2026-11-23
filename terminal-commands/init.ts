@@ -22,7 +22,7 @@ async function clientIDPart(rl: readline.Interface) {
 	const client_id = await rl.question("client_id: ");
 
 	Module.authorization.client_id = client_id;
-	await Module.data.save();
+	await Module.data.save(true);
 	console.log(`Saved!`);
 }
 
@@ -34,7 +34,7 @@ async function clientSecretPart(rl: readline.Interface) {
 	const client_secret = await rl.question("client_secret: ");
 
 	Module.authorization.client_secret = client_secret;
-	await Module.data.save();
+	await Module.data.save(true);
 	console.log(`Saved!`);
 }
 
@@ -103,7 +103,7 @@ async function authorizePart() {
 
 	Module.authorization.refresh_token = result.refresh_token;
 	Module.data.disabled = false;
-	await Module.data.save();
+	await Module.data.save(true);
 	console.log(`Saved!`);
 }
 

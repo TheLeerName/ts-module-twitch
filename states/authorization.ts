@@ -27,14 +27,14 @@ export class AuthorizationState {
 		});
 		if (!result.ok) {
 			this.refresh_token = "";
-			await Module.data.save();
+			await Module.data.save(true);
 			await Module.fatalWithDisabling(`Refreshing token was failed`, {error: `${result.status}: ${result.message}`})
 			return;
 		}
 
 		this.token = result.access_token;
 		this.refresh_token = result.refresh_token;
-		await Module.data.save();
+		await Module.data.save(true);
 	}
 
 	async validate() {
@@ -49,12 +49,12 @@ export class AuthorizationState {
 		}
 		if (result.user_id == null) {
 			this.refresh_token = "";
-			await Module.data.save();
+			await Module.data.save(true);
 			return await Module.fatalWithDisabling(`Validating token was failed`, {error: `Gotten token is not user access token`});
 		}
 		if ((result.scopes ?? []).sort().join("") !== Module.scopes.sort().join("")) {
 			this.refresh_token = "";
-			await Module.data.save();
+			await Module.data.save(true);
 			return await Module.fatalWithDisabling(`Validating token was failed`, {error: `Gotten token has incorrect scopes`});
 		}
 

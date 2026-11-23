@@ -60,7 +60,7 @@ export class Module extends EventEmitter implements Core.IModule {
 
 	async fatalWithDisabling(msg: any, options?: Parameters<typeof this.log.fatal>[1]) {
 		this.data.disabled = true;
-		await this.data.save();
+		await this.data.save(true);
 		return this.log.fatal(msg, options);
 	}
 
