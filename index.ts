@@ -28,13 +28,13 @@ export class Module extends EventEmitter implements Core.IModule {
 		super();
 		//throw new Error("nope.");
 
-		// init axios-retry
-		axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
-
 		TerminalCommandInit();
 	}
 
 	async load() {
+		// init axios-retry
+		axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
+
 		Core.default.modules.setReadonlyFields(this, {
 			data: new Data(this),
 			core: Core.default,
