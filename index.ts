@@ -80,11 +80,11 @@ export class TwitchModule extends EventEmitter {
 		}
 	}
 
-	getVODSavingTime(broadcasterType: Twitch.Helix.GetUsers.ResponseBody["data"][0]["broadcaster_type"]): number {
+	getVODSavingTime(broadcasterType?: Twitch.Helix.GetUsers.ResponseBody["data"][0]["broadcaster_type"]): number {
 		switch(broadcasterType) {
 			case "partner":   return 5184000000; // 60 days in ms
 			case "affiliate": return 1209600000; // 14 days in ms
-			case "":          return 604800000;  // 7 days in ms
+			default:          return 604800000;  // 7 days in ms
 		}
 	}
 
