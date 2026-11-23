@@ -15,10 +15,10 @@ interface ModuleEvents {
 
 export class Module extends EventEmitter implements Core.IModule {
 	readonly name = "twitch" as const;
-	readonly data: Data;
-	readonly core: Core.Core;
-	readonly log: Core.ModuleLogFunctions;
-	readonly authorization: AuthorizationState;
+	readonly data!: Data;
+	readonly core!: Core.Core;
+	readonly log!: Core.ModuleLogFunctions;
+	readonly authorization!: AuthorizationState;
 
 	readonly redirect_url = new URL("http://localhost:44026");
 	readonly scopes: string[] = [];
@@ -113,7 +113,7 @@ export class Data extends Core.BaseData {
 	/** If this `true`, next call of {@link save()} will save data */
 	needsSave = false;
 
-	protected module: Module;
+	declare protected module: Module;
 
 	initialize() {
 		const json = this.getSavedFields();
