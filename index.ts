@@ -44,6 +44,7 @@ export class Module extends EventEmitter implements Core.IModule {
 	}
 
 	async initialize() {
+		if (this.data.disabled) return;
 		await this.load();
 
 		await this.data.checkRequiredFields();
@@ -107,7 +108,7 @@ export class Module extends EventEmitter implements Core.IModule {
 
 export class Data extends Core.BaseData {
 	/** Module will disable itself on next app start, when fatal error will occure */
-	disabled: boolean = false;
+	disabled = false;
 	/** If this `true`, next call of {@link save()} will save data */
 	needsSave = false;
 
