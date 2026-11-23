@@ -45,10 +45,9 @@ export class Module extends EventEmitter implements Core.IModule {
 	}
 
 	async initialize() {
+		await this.load();
 		if (this.data.disabled)
 			throw new Error("Module was disabled, check logs");
-
-		await this.load();
 
 		await this.data.checkRequiredFields();
 		await this.authorization.validate();
