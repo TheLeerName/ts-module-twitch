@@ -22,8 +22,6 @@ export default class Authorization {
 	/** Will be not empty after validating */
 	login = "";
 
-	request = new AuthorizationRequest(this);
-
 	fromJSON(json: Partial<AuthorizationSave>) {
 		if (json.refresh != null)
 			this.refresh_token = json.refresh;
@@ -77,6 +75,27 @@ export default class Authorization {
 		this.login = result.login;
 	}
 
+	async request<Parameters extends Twitch.RequestParameters = Twitch.RequestParameters, Response extends Twitch.Response<{}, Twitch.ResponseBodyError> = Twitch.Response<{}, Twitch.ResponseBodyError>>(func: (params: Parameters) => Promise<Response>, params: Omit<Parameters, "client_id" | "token">): Promise<Response> {
+		const result = await func({
+			client_id: this.client_id,
+			token: this.token,
+			...params,
+		} as any);
+		if (result.status === 401) {
+			await this.refresh();
+			return this.request(func, params);
+		}
+		if (result.status === 429) {
+			let delay = 2500;
+			const ratelimitResetString = result.headers["ratelimit-reset"];
+			if (ratelimitResetString != null)
+				delay += parseInt(ratelimitResetString) * 1000 - Date.now();
+			await new Promise<void>(resolve => setTimeout(resolve, delay));
+			return this.request(func, params);
+		}
+		return result;
+	}
+
 	toJSON(): AuthorizationSave {
 		return {
 			refresh: this.refresh_token,
@@ -84,29 +103,4 @@ export default class Authorization {
 			secret: this.client_secret,
 		};
 	}
-}
-
-export class AuthorizationRequest {
-	private parent: Authorization;
-	constructor(parent: Authorization) {
-		this.parent = parent;
-	}
-
-	async withRefreshing<Parameters extends Twitch.RequestParameters = Twitch.RequestParameters, Response extends Twitch.Response<{}, Twitch.ResponseBodyError> = Twitch.Response<{}, Twitch.ResponseBodyError>>(func: (params: Parameters) => Promise<Response>, params: Omit<Parameters, "client_id" | "token">): Promise<Response> {
-		const result = await func({
-			client_id: this.parent.client_id,
-			token: this.parent.token,
-			...params,
-		} as any);
-		if (result.status === 401) {
-			await this.parent.refresh();
-			return this.withRefreshing(func, params);
-		}
-		return result;
-	}
-
-	async getStreams(params: Twitch.Helix.GetStreams.RequestQueryParameters) {
-		return await this.withRefreshing(Twitch.Helix.GetStreams.axiosRequest, params);
-	}
-	// TODO: add more methods here
 }
