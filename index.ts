@@ -20,9 +20,7 @@ export class Module extends EventEmitter implements Core.IModule {
 	readonly log: Core.ModuleLogFunctions;
 
 	readonly redirect_url = new URL("http://localhost:44026");
-	readonly scopes: string[] = [
-		"user:read:chat",
-	];
+	readonly scopes: string[] = [];
 	readonly authorization: Authorization = new Authorization();
 	readonly ws: WebSocket = new WebSocket();
 
@@ -51,15 +49,6 @@ export class Module extends EventEmitter implements Core.IModule {
 		await this.data.checkRequiredFields();
 		await this.authorization.validate();
 		this.emit("initialized");
-
-		/*this.ws.on("channel.chat.message", message => {
-			const event = message.payload.event;
-			this.log.info(`${event.chatter_user_name}: ${event.message.text}`, {args: event});
-		});
-		await this.ws.subscribeToEvent(Twitch.EventSub.ChannelChatMessage.RequestBody, {
-			broadcaster_user_id: this.authorization.user_id,
-			user_id: this.authorization.user_id,
-		});*/
 	}
 
 	isDisabled() {
