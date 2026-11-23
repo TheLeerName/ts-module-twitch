@@ -1,36 +1,23 @@
-import Module from "./index.js";
+import Module from "../index.js";
 
 import * as Twitch from "twitch.ts";
 
-export interface AuthorizationSave {
-	refresh: string;
-	id: string;
-	secret: string;
-}
+export interface AuthorizationStateSave {
+	refresh?: string;
+	id?: string;
+	secret?: string;
+};
 
-export default class Authorization {
+export class AuthorizationState {
 	/** Will be not empty after validating */
 	token = "";
-	/** After changing this, do not forget to do `Module.data.save()` */
 	refresh_token = "";
-	/** After changing this, do not forget to do `Module.data.save()` */
 	client_id = "";
-	/** After changing this, do not forget to do `Module.data.save()` */
 	client_secret = "";
 	/** Will be not empty after validating */
 	user_id = "";
 	/** Will be not empty after validating */
 	login = "";
-
-	fromJSON(json: Partial<AuthorizationSave>) {
-		if (json.refresh != null)
-			this.refresh_token = json.refresh;
-		if (json.id != null)
-			this.client_id = json.id;
-		if (json.secret != null)
-			this.client_secret = json.secret;
-		return this;
-	}
 
 	async refresh() {
 		const result = await Twitch.OAuth2.RefreshUserAccessToken.axiosRequest({
@@ -96,11 +83,23 @@ export default class Authorization {
 		return result;
 	}
 
-	toJSON(): AuthorizationSave {
+	fromJSON(json: AuthorizationStateSave) {
+		if (json != null) {
+			if (json.refresh != null)
+				this.refresh_token = json.refresh;
+			if (json.id != null)
+				this.client_id = json.id;
+			if (json.secret != null)
+				this.client_secret = json.secret;
+		}
+		return this;
+	}
+
+	toJSON(): AuthorizationStateSave {
 		return {
-			refresh: this.refresh_token,
-			id: this.client_id,
-			secret: this.client_secret,
+			refresh: this.refresh_token.length > 0 ? this.refresh_token : undefined,
+			id: this.client_id.length > 0 ? this.client_id : undefined,
+			secret: this.client_secret.length > 0 ? this.client_secret : undefined,
 		};
 	}
 }

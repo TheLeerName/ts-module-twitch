@@ -1,5 +1,5 @@
 import * as Core from "../../index.js";
-import Authorization from "./authorization.js";
+import { AuthorizationState } from "./states/authorization.js";
 import WebSocket from "./websocket.js";
 import TerminalCommandInit, { twitchInitName } from "./terminal-commands/init.js";
 
@@ -18,10 +18,10 @@ export class Module extends EventEmitter implements Core.IModule {
 	readonly data: Data;
 	readonly core: Core.Core;
 	readonly log: Core.ModuleLogFunctions;
+	readonly authorization: AuthorizationState;
 
 	readonly redirect_url = new URL("http://localhost:44026");
 	readonly scopes: string[] = [];
-	readonly authorization: Authorization = new Authorization();
 	readonly ws: WebSocket = new WebSocket();
 
 	constructor() {
@@ -39,6 +39,7 @@ export class Module extends EventEmitter implements Core.IModule {
 			data: new Data(this),
 			core: Core.default,
 			log: Core.default.log.makeFunctions(this.name),
+			authorization: new AuthorizationState(),
 		});
 		this.data.initialize();
 	}
@@ -146,3 +147,5 @@ export class Data extends Core.BaseData {
 }
 
 export default new Module();
+
+export * from "./states/authorization.js";
